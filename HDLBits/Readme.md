@@ -3,12 +3,12 @@
 **This website is used for verilog practice.**
 
 1. [ ] Verilog Language
-   1. [ ] Basics
+   1. [x] Basics
    [Basics.md](./Basics.md)
-   2. [ ] Vectors
+   2. [x] Vectors
    [Vectors.md](./Vectors.md)
    3. [ ] Modules: Hierarchy
-   [HIerarchy.md](./Modules_Hierarchy.md)
+   [Hierarchy.md](./Modules_Hierarchy.md)
    4. [ ] Procedures
    5. [ ] More Verilog Features
 2. [ ] Circuits
