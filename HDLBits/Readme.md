@@ -8,6 +8,7 @@
    2. [ ] Vectors
    [Vectors.md](./Vectors.md)
    3. [ ] Modules: Hierarchy
+   [HIerarchy.md](./Modules_Hierarchy.md)
    4. [ ] Procedures
    5. [ ] More Verilog Features
 2. [ ] Circuits

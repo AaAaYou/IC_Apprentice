@@ -1,4 +1,4 @@
-# Wire
+# Simple Wire
 
 Unlike physical wires, wires(and other signals) in Verilog are directional. This means information flows in only one direction, from (usually one) source to the sinks (The source is also often called a driver that drives a value onto a wire). In a Verilog "continuous assignment" (`assign left_side = right_side;`), the value of the signal on the right side is driven onto the wire on the left side. The assignment is "continuous" because the assignment continues all the time even if the right side's value changes. A continuous assignment is not a one-time event. 
 
@@ -12,7 +12,7 @@ endmodule
 
 When you have multiple assign statements, the **order** in which they appear in the code **does not matter**. Unlike a programming language, assign statements ("continuous assignments") describe *connections* between things, not the *action* of copying a value from one thing to another.
 
-# Notgate
+# Inverter
 
 This circuit is similar to wire, but with a slight difference. When making the connection from the wire `in` to the wire `out` we're going to implement an inverter (or "NOT-gate") instead of a plain wire.
 
@@ -24,7 +24,7 @@ module top_module(input in, output out);
 endmodule
 ```
 
-# Andgate
+# AND gate
 
 Note that this circuit is very similar to the NOT gate, just with one more input. If it sounds different, it's because I've started describing signals as being *driven* (has a known value determined by something attached to it) or *not driven* by something. `Input wires` are driven by something outside the module. `assign` statements will drive a logic level onto a wire.
 
@@ -34,7 +34,7 @@ module top_module(input a, input b, output out);
 endmodule
 ```
 
-# Norgate
+# NOR gate
 
 A NOR gate is an OR gate with its output inverted. A NOR function needs two operators when written in Verilog.
 
@@ -44,7 +44,7 @@ module top_module(input a, input b, output out);
 endmodule
 ```
 
-# Xnorgate
+# XNOR gate
 
 ```verilog
 module top_module(input a, input b, output out);
@@ -52,7 +52,7 @@ module top_module(input a, input b, output out);
 endmodule
 ```
 
-# Wire decl
+# Declaring wires
 
 As circuits become more complex, you will need wires to connect internal components together. When you need to use a wire, you should declare it in the body of the module, somewhere before it is first used.
 
@@ -83,11 +83,11 @@ module top_module(
     input d,
     output out,
     output out_n   ); 
-    
+
     wire and0;
     wire and1;
     wire or0;
-    
+
     assign and0 = a & b;
     assign and1 = c & d;
     assign or0 = and0 | and1;
@@ -96,7 +96,7 @@ module top_module(
 endmodule
 ```
 
-# 7458
+# 7458 chip
 
 Create a module with the same functionality as the 7458 chip. It has 10 inputs and 2 outputs. You may choose to use an `assign` statement to drive each of the output wires, or you may choose to declare (four) wires for use as intermediate signals, where each internal wire is driven by the output of one of the AND gates. For extra practice, try it both ways.
 
@@ -108,10 +108,8 @@ module top_module(
     output p1y,
     input p2a, p2b, p2c, p2d,
     output p2y );
-    
+
     assign p2y = (p2a & p2b) | (p2c & p2d);
     assign p1y = (p1a & p1b & p1c) | (p1d & p1e & p1f);
 endmodule
-
-
 ```
