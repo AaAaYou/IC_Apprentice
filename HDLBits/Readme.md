@@ -6,6 +6,7 @@
    1. [ ] Basics
    [Basics.md](./Basics.md)
    2. [ ] Vectors
+   [Vectors.md](./Vectors.md)
    3. [ ] Modules: Hierarchy
    4. [ ] Procedures
    5. [ ] More Verilog Features
