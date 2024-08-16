@@ -7,9 +7,10 @@
    [Basics.md](./Basics.md)
    2. [x] Vectors
    [Vectors.md](./Vectors.md)
-   3. [ ] Modules: Hierarchy
+   3. [x] Modules: Hierarchy
    [Hierarchy.md](./Modules_Hierarchy.md)
    4. [ ] Procedures
+   [Procedures.md](./Procedures.md)
    5. [ ] More Verilog Features
 2. [ ] Circuits
    1. [ ] Combinational Logic
