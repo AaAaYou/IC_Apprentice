@@ -24,7 +24,7 @@ module top_module(
     output reg out_alwaysblock
 );
     assign out_assign = a & b;
-    
+
     always @(*)
         begin
             out_alwaysblock = a & b;
@@ -64,13 +64,13 @@ module top_module(
     output reg out_always_ff   );
 
     assign out_assign = a ^ b;
-    
+
     always @(*) begin
-    	out_always_comb = a ^ b;
+        out_always_comb = a ^ b;
     end
-    
+
     always @(posedge clk) begin
-    	out_always_ff <= a ^ b;
+        out_always_ff <= a ^ b;
     end
 endmodule
 ```
@@ -106,13 +106,13 @@ module top_module(
     input sel_b2,
     output wire out_assign,
     output reg out_always   ); 
-    
+
     wire [1:0] sel;
-    
+
     assign sel = {sel_b2, sel_b1};
-    
+
     assign out_assign = (sel == 2'b11)? b: a;
-    
+
     always @(*) begin
         if (sel == 2'b11) begin
             out_always = b;
@@ -157,6 +157,173 @@ module top_module (
     end
 
 endmodule
+```
+
+# Case statement
+
+Case statements in Verilog are nearly equivalent to a sequence of if-elseif-else that compares one expression to a list of others. Its syntax and functionality differs from the switch statement in C.
+
+```verilog
+always @(*) begin     // This is a combinational circuit
+    case (in)
+      1'b1: begin 
+               out = 1'b1;  // begin-end if >1 statement
+            end
+      1'b0: out = 1'b0;
+      default: out = 1'bx;
+    endcase
+end
+```
+
+- The case statement begins with case and each "case item" ends with a colon. There is no "switch".
+- Each case item can execute *exactly one* statement. This makes the "break" used in C unnecessary. But this means that if you need more than one statement, you must use begin ... end.
+- Duplicate (and partially overlapping) case items are permitted. The first one that matches is used. C does not allow duplicate case items.
+
+```verilog
+// synthesis verilog_input_version verilog_2001
+module top_module ( 
+    input [2:0] sel, 
+    input [3:0] data0,
+    input [3:0] data1,
+    input [3:0] data2,
+    input [3:0] data3,
+    input [3:0] data4,
+    input [3:0] data5,
+    output reg [3:0] out   );//
+
+    always@(*) begin  // This is a combinational circuit
+        case(sel)
+            3'b000: begin
+                out = data0;
+            end
+            3'b001: begin
+                out = data1;
+            end
+            3'b010: begin
+                out = data2;
+            end
+            3'b011: begin
+                out = data3;
+            end
+            3'b100: begin
+                out = data4;
+            end
+            3'b101: begin
+                out = data5;
+            end
+           	default: out = 4'b0;
+        endcase
+    end
+
+endmodule
+```
+
+# Priority encoder
+
+A *priority encoder* is a combinational circuit that, when given an input bit vector, outputs the position of the first 1 bit in the vector. For example, a 8-bit priority encoder given the input 8'b100<u>1</u>0000 would output 3'd4, because bit[4] is first bit that is high.
+
+```verilog
+// synthesis verilog_input_version verilog_2001
+module top_module (
+    input [3:0] in,
+    output reg [1:0] pos  );
+
+    always@(*) begin
+        case(in)
+            4'b0000: pos = 2'b00;
+            4'b0001: pos = 2'b00;
+            4'b0010: pos = 2'b01;
+            4'b0011: pos = 2'b00;
+            4'b0100: pos = 2'b10;
+            4'b0101: pos = 2'b00;
+            4'b0110: pos = 2'b01;
+            4'b0111: pos = 2'b00;
+            4'b1000: pos = 2'b11;
+            4'b1001: pos = 2'b00;
+            4'b1010: pos = 2'b01;
+            4'b1011: pos = 2'b00;
+            4'b1100: pos = 2'b10;
+            4'b1101: pos = 2'b00;
+            4'b1110: pos = 2'b01;
+            4'b1111: pos = 2'b00;
+        endcase
+    end
+endmodule
+```
+
+# Priority encoder with casez
+
+From the previous exercise ([always_case2](https://hdlbits.01xz.net/wiki/always_case2 "always_case2")), there would be 256 cases in the case statement. We can reduce this (down to 9 cases) if the case items in the case statement supported don't-care bits. This is what case**z** is for: It treats bits that have the value z as don't-care in the comparison.
+
+For example, this would implement the 4-input priority encoder from the previous exercise:
+
+```verilog
+always @(*) begin
+    casez (in[3:0])
+        4'bzzz1: out = 0;   // in[3:1] can be anything
+        4'bzz1z: out = 1;
+        4'bz1zz: out = 2;
+        4'b1zzz: out = 3;
+        default: out = 0;
+    endcase
+end
+```
+
+A case statement behaves as though each item is checked sequentially (in reality, a big combinational logic function). Notice how there are certain inputs (e.g., 4'b1111) that will match more than one case item. The first match is chosen (so 4'b1111 matches the first item, out = 0, but not any of the later ones).
+
+- There is also a similar casex that treats both x and z as don't-care. I don't see much purpose to using it over casez.
+- The digit ? is a synonym for z. so 2'bz0 is the same as 2'b?0
+
+```verilog
+// synthesis verilog_input_version verilog_2001
+module top_module (
+    input [7:0] in,
+    output reg [2:0] pos );
+    
+    always@(*) begin
+        casez(in[7:0])
+            8'bzzzzzzz1: pos = 0;
+            8'bzzzzzz1z: pos = 1;
+            8'bzzzzz1zz: pos = 2;
+            8'bzzzz1zzz: pos = 3;
+            8'bzzz1zzzz: pos = 4;
+            8'bzz1zzzzz: pos = 5;
+            8'bz1zzzzzz: pos = 6;
+            8'b1zzzzzzz: pos = 7;
+            default: pos = 0;
+        endcase
+    end
+
+endmodule
+```
+
+# Avoiding lateches
+
+Suppose you're building a circuit to process scancodes from a PS/2 keyboard for a game. Given the last two bytes of scancodes received, you need to indicate whether one of the arrow keys on the keyboard have been pressed. This involves a fairly simple mapping, which can be implemented as a case statement (or if-elseif) with four cases.
+
+| Scancode [15:0] | Arrow key   |
+| --------------- | ----------- |
+| 16'he06b        | left arrow  |
+| 16'he072        | down arrow  |
+| 16'he074        | right arrow |
+| 16'he075        | up arrow    |
+| Anything else   | none        |
+
+To avoid creating latches, all outputs must be assigned a value in all possible conditions (See also [always_if2](https://hdlbits.01xz.net/wiki/always_if2 "always_if2")). Simply having a default case is not enough. You must assign a value to all four outputs in all four cases and the default case. This can involve a lot of unnecessary typing. One easy way around this is to assign a "default value" to the outputs *before* the case statement:
+
+```verilog
+always @(*) begin
+    up = 1'b0; down = 1'b0; left = 1'b0; right = 1'b0;
+    case (scancode)
+        ... // Set to 1 as necessary.
+    endcase
+end
+```
+
+This style of code ensures the outputs are assigned a value (of 0) in all possible cases unless the case statement overrides the assignment. This also means that a default: case item becomes unnecessary.
+
+```verilog
+
 ```
 
 
