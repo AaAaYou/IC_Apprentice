@@ -93,5 +93,87 @@ endmodule
 Given a 100-bit input vector [99:0], reverse its bit ordering.
 
 ```verilog
+module top_module( 
+    input [99:0] in,
+    output [99:0] out
+);
+    integer i;
+
+    always @(*) begin
+        for (i=0;i<100;i=i+1) begin
+            out[i] = in[99-i];
+        end
+    end
+
+endmodule
+```
+
+# Combinational for-loop: 255-bit population count
+
+A "population count" circuit counts the number of '1's in an input vector. Build a population count circuit for a 255-bit input vector.
+
+```verilog
+module top_module( 
+    input [254:0] in,
+    output [7:0] out );
+
+    integer i;
+    reg [7:0] out_reg;
+
+    always @(*) begin
+        out_reg = 0;
+        for (i=0;i<255;i=i+1) begin
+            if (in[i]==1)
+                out_reg = out_reg + 1;
+        end
+    end
+
+    assign out = out_reg;
+
+endmodule
+```
+
+# Generate for-loop: 100-bit binary adder 2
+
+Create a 100-bit binary ripple-carry adder by instantiating 100 [full adders](https://hdlbits.01xz.net/wiki/Fadd "Fadd"). The adder adds two 100-bit numbers and a carry-in to produce a 100-bit sum and carry out.
+
+```verilog
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output [99:0] cout,
+    output [99:0] sum );
+
+    reg [99:0] count_reg;
+    reg [99:0] sum_reg;
+
+    always @(*) begin
+        sum_reg[0]=a[0]^b[0]^cin;
+        count_reg[0]=(a[0]&b[0])|((a[0]|b[0])&cin);
+    end
+
+    genvar i;
+    generate
+        for(i=1;i<100;i=i+1) begin: hund_addrer
+            always @(*) begin
+                sum_reg[i]=a[i]^b[i]^count_reg[i-1];
+                count_reg[i]=(a[i]&b[i])|((a[i]|b[i])&count_reg[i-1]);
+            end
+        end
+    endgenerate
+
+    assign cout = count_reg;
+    assign sum = sum_reg;
+
+endmodule
+```
+
+# Generate for-lopp: 100-digit BCD addr
+
+You are provided with a BCD one-digit adder named bcd_fadd that adds two BCD digits and carry-in, and produces a sum and carry-out.
+
+Instantiate 100 copies of bcd_fadd to create a 100-digit BCD ripple-carry adder. Your adder should add two 100-digit BCD numbers (packed into 400-bit vectors) and a carry-in to produce a 100-digit sum and carry out.
+
+```verilog
 
 ```
